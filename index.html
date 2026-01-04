@@ -24,8 +24,8 @@
         }
 
         .nav-tab-active {
-            color: #4f46e5;
-            border-bottom: 2px solid #4f46e5;
+            color: #e5a046;
+            border-bottom: 2px solid #e5a046;
         }
 
         .option-card {
@@ -40,9 +40,9 @@
         }
 
         .option-card.selected {
-            border-color: #4f46e5;
-            background-color: #eef2ff;
-            color: #4f46e5;
+            border-color: #e5a046;
+            background-color: #fef8f0;
+            color: #e5a046;
         }
 
         .animate-fade-in {
@@ -61,15 +61,15 @@
     <aside class="w-72 bg-white border-r border-slate-200 hidden lg:flex flex-col fixed h-full z-30">
         <div class="p-8">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white">
+                <div class="w-10 h-10 bg-[#e5a046] rounded-xl flex items-center justify-center text-white">
                     <i class="fas fa-feather-alt"></i>
                 </div>
-                <h1 class="text-xl font-extrabold tracking-tight">Lexi<span class="text-indigo-600">Pro</span></h1>
+                <h1 class="text-xl font-extrabold tracking-tight">Brain<span class="text-[#e5a046]">gym</span></h1>
             </div>
         </div>
         <nav class="flex-1 px-4 space-y-1">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-2">Curriculum</p>
-            <button onclick="switchModule('adverbs')" class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl bg-indigo-50 text-indigo-700 font-bold transition-all">
+            <button onclick="switchModule('adverbs')" class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl bg-[#fef8f0] text-[#e5a046] font-bold transition-all">
                 <i class="fas fa-bolt"></i> Adverbs Module
             </button>
             <button class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-slate-400 font-bold cursor-not-allowed">
@@ -124,16 +124,16 @@
                             <h3 class="text-2xl font-black text-slate-900 mb-4">What is an Adverb?</h3>
                             <p class="text-lg text-slate-600 leading-relaxed">
                                 An <strong>adverb</strong> is a word that modifies or describes a verb, an adjective, or another adverb. 
-                                It provides more information about <span class="text-indigo-600 font-bold">how</span>, 
-                                <span class="text-indigo-600 font-bold">where</span>, 
-                                <span class="text-indigo-600 font-bold">when</span>, or 
-                                <span class="text-indigo-600 font-bold">to what extent</span> an action is performed.
+                                It provides more information about <span class="text-[#e5a046] font-bold">how</span>, 
+                                <span class="text-[#e5a046] font-bold">where</span>, 
+                                <span class="text-[#e5a046] font-bold">when</span>, or 
+                                <span class="text-[#e5a046] font-bold">to what extent</span> an action is performed.
                             </p>
                         </section>
 
                         <div class="grid md:grid-cols-2 gap-6">
                             <div class="content-card">
-                                <h4 class="font-bold text-indigo-600 mb-2 uppercase text-xs tracking-widest">Formation</h4>
+                                <h4 class="font-bold text-[#e5a046] mb-2 uppercase text-xs tracking-widest">Formation</h4>
                                 <p class="text-sm text-slate-600">Most adverbs are formed by adding <strong>-ly</strong> to an adjective.</p>
                                 <ul class="mt-4 space-y-2 text-sm">
                                     <li class="flex justify-between border-b pb-1"><span>Quick (Adj)</span> <i class="fas fa-arrow-right text-slate-300"></i> <span class="font-bold">Quickly</span></li>
@@ -142,7 +142,7 @@
                                 </ul>
                             </div>
                             <div class="content-card">
-                                <h4 class="font-bold text-indigo-600 mb-2 uppercase text-xs tracking-widest">Placement</h4>
+                                <h4 class="font-bold text-[#e5a046] mb-2 uppercase text-xs tracking-widest">Placement</h4>
                                 <p class="text-sm text-slate-600">Adverbs of manner usually go after the verb or after the object.</p>
                                 <div class="mt-4 p-3 bg-slate-50 rounded-lg italic text-slate-500 text-sm">
                                     "She sang <span class="text-slate-900 font-bold">beautifully</span>."
@@ -209,7 +209,7 @@
             const container = document.getElementById('main-content');
             
             // Update tabs
-            document.querySelectorAll('header button').forEach(btn => btn.classList.remove('nav-tab-active', 'text-indigo-600'));
+            document.querySelectorAll('header button').forEach(btn => btn.classList.remove('nav-tab-active', 'text-[#e5a046]'));
             document.querySelectorAll('header button').forEach(btn => btn.classList.add('text-slate-500'));
             document.getElementById(`tab-${view}`).classList.add('nav-tab-active');
             document.getElementById(`tab-${view}`).classList.remove('text-slate-500');
@@ -221,8 +221,8 @@
                     <div class="grid gap-6">
                         ${moduleData.adverbs.examples.map(ex => `
                             <div class="content-card flex flex-col md:flex-row gap-6 items-start">
-                                <div class="bg-indigo-50 p-4 rounded-2xl shrink-0">
-                                    <button onclick="speakText('${ex.context}')" class="text-indigo-600 hover:scale-110 transition-transform">
+                                <div class="bg-[#fef8f0] p-4 rounded-2xl shrink-0">
+                                    <button onclick="speakText('${ex.context}')" class="text-[#e5a046] hover:scale-110 transition-transform">
                                         <i class="fas fa-volume-up text-xl"></i>
                                     </button>
                                 </div>
@@ -231,7 +231,7 @@
                                         <h4 class="text-xl font-bold text-slate-900">${ex.word}</h4>
                                         <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded uppercase tracking-widest">${ex.type}</span>
                                     </div>
-                                    <p class="text-lg text-slate-700 italic border-l-4 border-indigo-200 pl-4 mb-3">"${ex.context}"</p>
+                                    <p class="text-lg text-slate-700 italic border-l-4 border-[#e5a046]/30 pl-4 mb-3">"${ex.context}"</p>
                                     <p class="text-sm text-slate-500">${ex.note}</p>
                                 </div>
                             </div>
@@ -253,7 +253,7 @@
                 <div class="max-w-2xl mx-auto">
                     <div class="mb-8 flex justify-between items-center">
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Question ${currentQuizIdx + 1} of 10</span>
-                        <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">Score: ${score}</span>
+                        <span class="text-xs font-bold text-[#e5a046] bg-[#fef8f0] px-3 py-1 rounded-full">Score: ${score}</span>
                     </div>
                     <div class="content-card mb-8">
                         <h3 class="text-xl font-bold text-slate-800 leading-relaxed mb-8">${question.q}</h3>
@@ -312,7 +312,7 @@
             const container = document.getElementById('main-content');
             container.innerHTML = `
                 <div class="text-center py-12">
-                    <div class="w-24 h-24 bg-indigo-600 rounded-3xl flex items-center justify-center text-white text-4xl mx-auto mb-6 shadow-xl">
+                    <div class="w-24 h-24 bg-[#e5a046] rounded-3xl flex items-center justify-center text-white text-4xl mx-auto mb-6 shadow-xl shadow-orange-100">
                         <i class="fas fa-trophy"></i>
                     </div>
                     <h2 class="text-3xl font-black mb-2">Assessment Complete</h2>
@@ -339,7 +339,7 @@
                         <h2 class="text-2xl font-bold mb-4">Accent Lab</h2>
                         <p class="text-slate-500 mb-6">Switch between dialects to practice your listening and pronunciation.</p>
                         <div class="grid grid-cols-3 gap-4">
-                            <button class="p-6 rounded-2xl border-2 border-indigo-600 bg-indigo-50 font-bold text-indigo-700">🇺🇸 US English</button>
+                            <button class="p-6 rounded-2xl border-2 border-[#e5a046] bg-[#fef8f0] font-bold text-[#e5a046]">🇺🇸 US English</button>
                             <button class="p-6 rounded-2xl border-2 border-slate-100 font-bold text-slate-400">🇬🇧 UK British</button>
                             <button class="p-6 rounded-2xl border-2 border-slate-100 font-bold text-slate-400">🇦🇺 AU Aussie</button>
                         </div>
