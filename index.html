@@ -3,239 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexiPro | English Grammar Journey</title>
+    <title>LexiPro | Premier Grammar Journey</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Din+Round:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background-color: #ffffff;
-            color: #4b4b4b;
+            color: #0f172a;
             overflow-x: hidden;
         }
 
-        .duo-card {
-            border: 2px solid #e5e5e5;
-            border-bottom: 4px solid #e5e5e5;
-            transition: all 0.1s ease;
+        /* Journey Progress Circle Styles */
+        .node-circle {
+            position: relative;
+            width: 96px;
+            height: 96px;
         }
 
-        .duo-card:active {
-            transform: translateY(2px);
-            border-bottom-width: 2px;
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
         }
 
-        .duo-button-primary {
-            background-color: #58cc02;
-            border-bottom: 4px solid #46a302;
-            color: white;
+        .journey-node:hover .node-icon-bg {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.2);
         }
 
-        .duo-button-primary:hover { background-color: #61e002; }
-        .duo-button-primary:active { border-bottom-width: 0; transform: translateY(4px); }
+        .node-icon-bg {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
 
-        .duo-button-secondary {
-            background-color: #1cb0f6;
-            border-bottom: 4px solid #1899d6;
-            color: white;
+        .btn-action {
+            transition: all 0.2s ease;
+        }
+
+        .btn-action:active {
+            transform: scale(0.96);
         }
 
         .progress-bar-fill {
-            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .option-btn {
-            border: 2px solid #e5e5e5;
-            border-bottom: 4px solid #e5e5e5;
-            text-align: left;
-            padding: 1rem;
-            border-radius: 1rem;
-            font-weight: 700;
-            transition: all 0.1s;
+        .option-card {
+            border: 2px solid #f1f5f9;
+            transition: all 0.2s ease;
         }
 
-        .option-btn:hover { background-color: #f7f7f7; }
-        .option-btn.selected {
-            background-color: #ddf4ff;
-            border-color: #84d8ff;
-            color: #1899d6;
+        .option-card:hover {
+            border-color: #cbd5e1;
+            background-color: #f8fafc;
+        }
+
+        .option-card.selected {
+            border-color: #4f46e5;
+            background-color: #eef2ff;
+            color: #4f46e5;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1);
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .animate-slide-up {
+            animation: slideInUp 0.4s ease-out forwards;
         }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
         }
         .shake { animation: shake 0.2s ease-in-out 0s 2; }
+
+        .accent-btn-active {
+            border-color: #4f46e5 !important;
+            background-color: #eef2ff !important;
+            color: #4f46e5 !important;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.1) !important;
+        }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex min-h-screen">
 
-    <!-- Top Navigation (Duolingo Style Stats) -->
-    <nav class="sticky top-0 bg-white border-b-2 border-gray-100 z-30">
-        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-6">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="resetToHome()">
-                    <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white shadow-sm">
-                        <i class="fas fa-feather-alt"></i>
-                    </div>
-                    <span class="text-xl font-extrabold text-green-500 tracking-tight hidden sm:block">lexipro</span>
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-72 bg-white border-r border-slate-100 hidden lg:flex flex-col fixed h-full z-30">
+        <div class="p-8">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-100">
+                    <i class="fas fa-feather-alt text-xl"></i>
                 </div>
-                
-                <!-- Lesson Progress (Only visible during lesson) -->
-                <div id="lessonProgressContainer" class="hidden flex-1 md:w-96 items-center gap-3">
-                    <button onclick="confirmExit()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
-                    <div class="flex-1 bg-gray-100 h-4 rounded-full overflow-hidden">
-                        <div id="lessonBar" class="progress-bar-fill bg-green-500 h-full" style="width: 10%"></div>
+                <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Lexi<span class="text-indigo-600">Pro</span></h1>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-1">
+            <button onclick="resetToHome()" id="nav-home" class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl bg-indigo-50 text-indigo-700 font-bold transition-all">
+                <i class="fas fa-home text-lg"></i> Home Journey
+            </button>
+            <button onclick="switchTab('accent')" id="nav-accent" class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-slate-500 hover:bg-slate-50 font-bold transition-all">
+                <i class="fas fa-microphone-alt text-lg"></i> Accent Lab
+            </button>
+            <button class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-slate-400 font-bold cursor-not-allowed">
+                <i class="fas fa-book-reader text-lg"></i> Dictionary
+            </button>
+            <button class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-slate-400 font-bold cursor-not-allowed">
+                <i class="fas fa-award text-lg"></i> Leaderboard
+            </button>
+            <button class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-slate-400 font-bold cursor-not-allowed">
+                <i class="fas fa-cog text-lg"></i> Settings
+            </button>
+        </nav>
+
+        <div class="p-6 mt-auto">
+            <div class="bg-slate-900 p-5 rounded-[2rem] text-white shadow-2xl relative overflow-hidden group">
+                <div class="relative z-10">
+                    <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">MEMBERSHIP</p>
+                    <p class="text-sm font-bold mb-3">Professional Plus</p>
+                    <button class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl text-xs font-black transition-all">MANAGE PLAN</button>
+                </div>
+                <i class="fas fa-crown absolute -bottom-4 -right-4 text-6xl text-white/5 group-hover:rotate-12 transition-transform"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 lg:ml-72 relative">
+        
+        <!-- Header Stats -->
+        <header class="sticky top-0 bg-white/95 backdrop-blur-md border-b border-slate-100 z-20">
+            <div class="max-w-5xl mx-auto px-8 h-20 flex items-center justify-between">
+                <!-- Progress for Lessons -->
+                <div id="lessonHeader" class="hidden flex-1 flex items-center gap-6">
+                    <button onclick="confirmExit()" class="text-slate-400 hover:text-slate-900 transition-colors"><i class="fas fa-times text-xl"></i></button>
+                    <div class="flex-1 bg-slate-100 h-4 rounded-full overflow-hidden">
+                        <div id="lessonBar" class="progress-bar-fill bg-indigo-600 h-full shadow-[0_0_10px_rgba(79,70,229,0.3)]" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Main Nav Stats -->
+                <div id="mainHeader" class="flex-1 flex items-center">
+                    <div class="flex items-center gap-8 ml-auto">
+                        <div class="flex items-center gap-2 group cursor-help" title="Daily Streak">
+                            <span class="text-orange-500 group-hover:scale-110 transition-transform"><i class="fas fa-fire text-xl"></i></span>
+                            <span id="statStreak" class="font-extrabold text-slate-800">12</span>
+                        </div>
+                        <div class="flex items-center gap-2 group cursor-help" title="Learning XP">
+                            <span class="text-blue-500 group-hover:scale-110 transition-transform"><i class="fas fa-bolt text-xl"></i></span>
+                            <span id="statXP" class="font-extrabold text-slate-800">2,850</span>
+                        </div>
+                        <div class="flex items-center gap-2 group cursor-help" title="Hearts Left">
+                            <span class="text-red-500 group-hover:scale-110 transition-transform"><i class="fas fa-heart text-xl"></i></span>
+                            <span id="statHearts" class="font-extrabold text-slate-800">5</span>
+                        </div>
+                        <div class="h-10 w-[1px] bg-slate-100"></div>
+                        <div class="w-10 h-10 rounded-2xl bg-slate-100 border-2 border-white shadow-sm overflow-hidden ring-2 ring-indigo-50">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="avatar">
+                        </div>
                     </div>
                 </div>
             </div>
+        </header>
 
-            <div class="flex items-center gap-6 font-bold text-gray-500">
-                <div class="flex items-center gap-2">
-                    <span class="text-orange-500"><i class="fas fa-fire text-xl"></i></span>
-                    <span id="statStreak">7</span>
+        <!-- Dynamic Content -->
+        <div class="max-w-4xl mx-auto p-8 lg:py-12 min-h-[calc(100vh-80px)]">
+            
+            <!-- Home: Journey Path View -->
+            <section id="viewHome" class="space-y-16 animate-slide-up">
+                <!-- Unit Header -->
+                <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-indigo-100 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                    <div class="space-y-1 relative z-10">
+                        <span class="text-[10px] font-black text-indigo-300 uppercase tracking-[0.2em]">Grammar Fundamentals</span>
+                        <h2 class="text-4xl font-black">Unit 1</h2>
+                        <p class="text-indigo-100 text-lg font-medium">Adverbs of Manner & Degree</p>
+                    </div>
+                    <button class="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 px-8 py-4 rounded-2xl flex items-center gap-3 font-black transition-all group relative z-10">
+                        <i class="fas fa-book-open group-hover:rotate-12 transition-transform"></i> Guidebook
+                    </button>
+                    <!-- Decorative Circle -->
+                    <div class="absolute -right-20 -bottom-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-blue-400"><i class="fas fa-gem text-xl"></i></span>
-                    <span id="statXP">1420</span>
+
+                <!-- Vertical Path -->
+                <div class="relative flex flex-col items-center gap-12 py-4">
+                    <!-- Lesson 1 -->
+                    <div onclick="startLesson('basic')" class="journey-node z-10 cursor-pointer flex flex-col items-center group">
+                        <div class="node-circle">
+                            <svg width="96" height="96">
+                                <circle class="progress-ring__circle" stroke="#f1f5f9" stroke-width="8" fill="transparent" r="40" cx="48" cy="48"/>
+                                <circle class="progress-ring__circle" stroke="#4f46e5" stroke-width="8" stroke-dasharray="251.32" stroke-dashoffset="62.83" fill="transparent" r="40" cx="48" cy="48"/>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="node-icon-bg w-16 h-16 bg-indigo-600 rounded-[1.5rem] flex items-center justify-center text-white text-2xl shadow-xl shadow-indigo-200">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-4 font-extrabold text-slate-800 tracking-tight">Introduction</p>
+                    </div>
+
+                    <!-- Lesson 2 -->
+                    <div class="journey-node z-10 cursor-pointer flex flex-col items-center group opacity-80 hover:opacity-100 transition-all">
+                         <div class="node-circle">
+                            <svg width="96" height="96">
+                                <circle class="progress-ring__circle" stroke="#f1f5f9" stroke-width="8" fill="transparent" r="40" cx="48" cy="48"/>
+                                <circle class="progress-ring__circle" stroke="#4f46e5" stroke-width="8" stroke-dasharray="251.32" stroke-dashoffset="251.32" fill="transparent" r="40" cx="48" cy="48"/>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="node-icon-bg w-16 h-16 bg-white border-2 border-slate-200 rounded-[1.5rem] flex items-center justify-center text-slate-400 text-2xl group-hover:border-indigo-200">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-4 font-extrabold text-slate-500 tracking-tight">Practical Phrases</p>
+                    </div>
+
+                    <div class="w-full flex items-center gap-6 py-6">
+                        <div class="h-px bg-slate-100 flex-1"></div>
+                        <span class="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Mastery Challenge</span>
+                        <div class="h-px bg-slate-100 flex-1"></div>
+                    </div>
+
+                    <!-- Locked -->
+                    <div class="journey-node z-10 opacity-40 flex flex-col items-center grayscale">
+                        <div class="node-circle">
+                            <svg width="96" height="96">
+                                <circle class="progress-ring__circle" stroke="#f8fafc" stroke-width="8" fill="transparent" r="40" cx="48" cy="48"/>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="node-icon-bg w-16 h-16 bg-slate-50 border-2 border-slate-100 rounded-[1.5rem] flex items-center justify-center text-slate-300 text-2xl">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-4 font-extrabold text-slate-400 tracking-tight">Advanced Nuances</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-red-500"><i class="fas fa-heart text-xl"></i></span>
-                    <span id="statHearts">5</span>
+            </section>
+
+            <!-- Lesson View -->
+            <section id="viewLesson" class="hidden h-full flex flex-col max-w-xl mx-auto py-4">
+                <div id="lessonContent" class="flex-1 space-y-10">
+                    <!-- Dynamic Lesson Components -->
+                </div>
+            </section>
+
+            <!-- Accent Lab -->
+            <section id="viewAccent" class="hidden space-y-10 animate-slide-up">
+                <div class="flex items-center gap-6">
+                    <button onclick="resetToHome()" class="w-12 h-12 flex items-center justify-center hover:bg-slate-100 rounded-2xl transition-all text-slate-400 hover:text-slate-900"><i class="fas fa-arrow-left text-lg"></i></button>
+                    <h2 class="text-3xl font-black tracking-tight">Accent Research Lab</h2>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-10">
+                    <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-10">
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Select Global Dialect</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                <button onclick="setAccent('en-US')" id="acc-us" class="p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-100 font-bold flex flex-col items-center gap-3 transition-all accent-btn-active">
+                                    <span class="text-3xl">🇺🇸</span> <span class="text-xs uppercase tracking-wider">US English</span>
+                                </button>
+                                <button onclick="setAccent('en-GB')" id="acc-uk" class="p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-100 font-bold flex flex-col items-center gap-3 transition-all">
+                                    <span class="text-3xl">🇬🇧</span> <span class="text-xs uppercase tracking-wider">UK British</span>
+                                </button>
+                                <button onclick="setAccent('en-AU')" id="acc-au" class="p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-100 font-bold flex flex-col items-center gap-3 transition-all">
+                                    <span class="text-3xl">🇦🇺</span> <span class="text-xs uppercase tracking-wider">AU Aussie</span>
+                                </button>
+                                <button onclick="setAccent('en-CA')" id="acc-ca" class="p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-100 font-bold flex flex-col items-center gap-3 transition-all">
+                                    <span class="text-3xl">🇨🇦</span> <span class="text-xs uppercase tracking-wider">CA Canada</span>
+                                </button>
+                                <button onclick="setAccent('en-IN')" id="acc-in" class="p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-100 font-bold flex flex-col items-center gap-3 transition-all">
+                                    <span class="text-3xl">🇮🇳</span> <span class="text-xs uppercase tracking-wider">IN Indian</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Synthesis Engine</p>
+                            <textarea id="labText" class="w-full bg-slate-50 p-6 rounded-3xl font-semibold text-slate-700 outline-none border-2 border-transparent focus:border-indigo-100 focus:bg-white h-32 transition-all placeholder:text-slate-300" placeholder="Type complex sentences here to hear nuanced pronunciation..."></textarea>
+                            
+                            <div class="flex gap-4">
+                                <select id="voiceTypeSelect" class="flex-1 bg-slate-100 px-4 py-4 rounded-2xl font-bold text-slate-700 outline-none appearance-none cursor-pointer hover:bg-slate-200 transition-all">
+                                    <option value="auto">Auto-detect Best</option>
+                                </select>
+                                <button onclick="generateAudio()" class="px-8 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">Play</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-900 rounded-[3rem] p-12 text-white flex flex-col justify-center items-center text-center shadow-2xl relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                        <div class="w-24 h-24 bg-white/10 rounded-[2rem] flex items-center justify-center text-4xl mb-8 border border-white/20 group-hover:rotate-6 transition-transform relative z-10 backdrop-blur-sm">
+                            <i class="fas fa-wave-square"></i>
+                        </div>
+                        <h3 class="text-3xl font-black mb-4 relative z-10">AI Voice Check</h3>
+                        <p class="text-indigo-200 text-lg mb-10 font-medium relative z-10">Our proprietary neural engine evaluates your rhythm, stress, and clarity.</p>
+                        <button onclick="startMicCheck('accurately')" class="bg-white text-indigo-900 px-12 py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-50 transition-all shadow-xl relative z-10 btn-action">Start Recording</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Lesson Footer -->
+        <div id="footerAction" class="fixed bottom-0 left-0 lg:left-72 right-0 bg-white border-t border-slate-100 p-8 z-40 transform translate-y-full transition-transform duration-500 ease-in-out shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+            <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div id="feedbackText" class="flex items-center gap-5 opacity-0 transition-opacity duration-300">
+                    <div id="feedbackIcon" class="w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-2xl shadow-lg"></div>
+                    <div>
+                        <p id="feedbackTitle" class="font-extrabold text-2xl tracking-tight"></p>
+                        <p id="feedbackSub" class="text-sm font-bold opacity-70"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <button id="btnCheck" onclick="checkSelection()" class="w-full sm:w-auto bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-[0.1em] disabled:opacity-20 disabled:bg-slate-300 transition-all btn-action shadow-xl shadow-indigo-100">Check Answer</button>
+                    <button id="btnContinue" onclick="nextStep()" class="hidden w-full sm:w-auto bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-[0.1em] hover:bg-indigo-700 transition-all btn-action shadow-xl shadow-indigo-100">Next Task</button>
                 </div>
             </div>
         </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="flex-1 max-w-5xl mx-auto w-full p-4 flex flex-col items-center">
-        
-        <!-- Home / Journey View -->
-        <section id="viewHome" class="w-full py-8 space-y-12 flex flex-col items-center">
-            <div class="text-center mb-4">
-                <h2 class="text-2xl font-black text-gray-800 uppercase tracking-wide">Unit 1: Adverbs of Manner</h2>
-                <p class="text-gray-500 font-bold">Learn to describe how things happen</p>
-            </div>
-
-            <!-- Path Nodes -->
-            <div class="flex flex-col items-center gap-8 w-full max-w-xs">
-                <div onclick="startLesson('basic')" class="relative cursor-pointer group">
-                    <div class="w-20 h-20 bg-green-500 rounded-full border-b-8 border-green-700 flex items-center justify-center text-white text-3xl shadow-lg transform group-hover:scale-110 transition-transform">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-bold">START LEVEL 1</div>
-                </div>
-
-                <div class="w-2 h-12 bg-gray-200 rounded-full"></div>
-
-                <div onclick="switchTab('accent')" class="relative cursor-pointer group">
-                    <div class="w-20 h-20 bg-blue-400 rounded-full border-b-8 border-blue-600 flex items-center justify-center text-white text-3xl shadow-lg transform group-hover:scale-110 transition-transform">
-                        <i class="fas fa-globe-americas"></i>
-                    </div>
-                    <div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-bold">ACCENT LAB</div>
-                </div>
-
-                <div class="w-2 h-12 bg-gray-200 rounded-full"></div>
-
-                <div class="relative opacity-50 cursor-not-allowed">
-                    <div class="w-20 h-20 bg-gray-300 rounded-full border-b-8 border-gray-400 flex items-center justify-center text-white text-3xl">
-                        <i class="fas fa-lock"></i>
-                    </div>
-                    <span class="absolute -right-16 top-1/2 -translate-y-1/2 text-gray-400 font-black text-sm uppercase">Unit 2</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Lesson View -->
-        <section id="viewLesson" class="hidden w-full max-w-xl py-12 flex-1 flex flex-col justify-between">
-            <div id="lessonContent" class="space-y-8">
-                <!-- Question injected here -->
-            </div>
-
-            <!-- Bottom Interaction Bar -->
-            <div id="footerAction" class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-100 p-6 z-40">
-                <div class="max-w-5xl mx-auto flex items-center justify-between">
-                    <div id="feedbackText" class="hidden flex items-center gap-4">
-                        <div id="feedbackIcon" class="w-12 h-12 rounded-full flex items-center justify-center text-2xl"></div>
-                        <div>
-                            <p id="feedbackTitle" class="font-black text-xl"></p>
-                            <p id="feedbackSub" class="text-sm font-bold opacity-80"></p>
-                        </div>
-                    </div>
-                    <div class="flex-1"></div>
-                    <button id="btnCheck" onclick="checkSelection()" class="duo-button-primary px-12 py-3 rounded-2xl font-black text-lg uppercase tracking-wider disabled:opacity-50 disabled:bg-gray-200 disabled:border-gray-300 transition-all">Check</button>
-                    <button id="btnContinue" onclick="nextStep()" class="hidden duo-button-primary px-12 py-3 rounded-2xl font-black text-lg uppercase tracking-wider transition-all">Continue</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Accent Lab View -->
-        <section id="viewAccent" class="hidden w-full max-w-4xl py-8 space-y-8">
-            <div class="flex items-center gap-4 mb-4">
-                <button onclick="resetToHome()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-arrow-left text-xl"></i></button>
-                <h2 class="text-3xl font-black text-gray-800">Accent Lab</h2>
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="space-y-6">
-                    <div class="bg-white duo-card p-6 rounded-3xl">
-                        <h3 class="text-lg font-black mb-4 uppercase text-gray-400">Select Instructor Accent</h3>
-                        <div class="grid grid-cols-3 gap-3">
-                            <button onclick="setAccent('en-US')" id="acc-us" class="p-4 rounded-2xl border-2 border-blue-500 bg-blue-50 text-blue-700 font-bold flex flex-col items-center gap-2">
-                                <span class="text-2xl">🇺🇸</span> US
-                            </button>
-                            <button onclick="setAccent('en-GB')" id="acc-uk" class="p-4 rounded-2xl border-2 border-gray-100 hover:border-blue-200 font-bold flex flex-col items-center gap-2">
-                                <span class="text-2xl">🇬🇧</span> UK
-                            </button>
-                            <button onclick="setAccent('en-CA')" id="acc-ca" class="p-4 rounded-2xl border-2 border-gray-100 hover:border-blue-200 font-bold flex flex-col items-center gap-2">
-                                <span class="text-2xl">🇨🇦</span> Canada
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white duo-card p-6 rounded-3xl">
-                         <h3 class="text-lg font-black mb-2 uppercase text-gray-400">Try it out</h3>
-                         <textarea id="labText" class="w-full bg-gray-50 p-4 rounded-2xl font-bold text-gray-700 outline-none h-32" placeholder="Type a sentence here..."></textarea>
-                         <button onclick="generateAudio()" class="mt-4 w-full duo-button-secondary py-4 rounded-2xl font-black uppercase">Hear in Accent</button>
-                    </div>
-                </div>
-
-                <div class="bg-blue-600 rounded-[2.5rem] p-10 text-white flex flex-col justify-center items-center text-center">
-                    <i class="fas fa-microphone-alt text-6xl mb-6"></i>
-                    <h3 class="text-2xl font-black mb-4">Pronunciation Coach</h3>
-                    <p class="font-bold opacity-80 mb-8">Speak any adverb into the mic and our coach will evaluate your natural rhythm.</p>
-                    <button onclick="startMicCheck('fluently')" class="bg-white text-blue-600 px-10 py-4 rounded-2xl font-black uppercase shadow-xl hover:scale-105 transition-all">Start Speaking</button>
-                </div>
-            </div>
-        </section>
-
     </main>
 
     <script>
-        // --- Game State ---
-        let xp = 1420;
+        // --- Core Application State ---
+        let xp = 2850;
         let hearts = 5;
-        let streak = 7;
+        let streak = 12;
         let currentLessonData = [];
         let lessonIndex = 0;
         let selectedOption = null;
-        let currentLevel = 'basic';
-        let voices = [];
         let activeAccent = 'en-US';
+        let voices = [];
 
         const db = {
             basic: [
-                { type: 'mcq', prompt: 'Select the correct adverb:', sentence: 'The snail moves _______ through the garden.', options: ['slowly', 'happy', 'quick'], correct: 'slowly', audio: 'The snail moves slowly through the garden.' },
-                { type: 'speak', prompt: 'Repeat this word:', target: 'Quickly', audio: 'Quickly' },
-                { type: 'translate', prompt: 'Tap the matching pair:', pairs: { 'Slowly': 'Lentamente', 'Happily': 'Felizmente', 'Quickly': 'Rápidamente' } },
-                { type: 'listen', prompt: 'What do you hear?', audio: 'She sang beautifully at the concert.', options: ['beautifully', 'beautify', 'beauty'], correct: 'beautifully' }
+                { type: 'mcq', prompt: 'Select the correct adverbial form:', sentence: 'The technician handled the delicate hardware _______ during the repair.', options: ['carefully', 'careful', 'carefulness'], correct: 'carefully', audio: 'The technician handled the delicate hardware carefully during the repair.' },
+                { type: 'speak', prompt: 'Pronounce the target word focusing on the syllable stress.', target: 'Accurately', audio: 'Accurately' },
+                { type: 'listen', prompt: 'Select the adverb that defines the degree in the audio.', audio: 'The weather was extremely cold this morning.', options: ['extremely', 'morning', 'weather'], correct: 'extremely' }
             ]
         };
 
-        // --- View Navigation ---
+        // --- Navigation Logic ---
 
         function startLesson(level) {
             currentLevel = level;
@@ -245,7 +358,8 @@
             
             document.getElementById('viewHome').classList.add('hidden');
             document.getElementById('viewLesson').classList.remove('hidden');
-            document.getElementById('lessonProgressContainer').classList.remove('hidden');
+            document.getElementById('lessonHeader').classList.remove('hidden');
+            document.getElementById('mainHeader').classList.add('hidden');
             renderLessonStep();
         }
 
@@ -253,12 +367,29 @@
             document.getElementById('viewHome').classList.remove('hidden');
             document.getElementById('viewLesson').classList.add('hidden');
             document.getElementById('viewAccent').classList.add('hidden');
-            document.getElementById('lessonProgressContainer').classList.add('hidden');
+            document.getElementById('lessonHeader').classList.add('hidden');
+            document.getElementById('mainHeader').classList.remove('hidden');
+            document.getElementById('footerAction').classList.add('translate-y-full');
+            
+            updateNavUI('home');
         }
 
         function switchTab(tab) {
             document.getElementById('viewHome').classList.add('hidden');
             document.getElementById('viewAccent').classList.remove('hidden');
+            document.getElementById('viewLesson').classList.add('hidden');
+            updateNavUI(tab);
+        }
+
+        function updateNavUI(active) {
+            ['nav-home', 'nav-accent'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('bg-indigo-50', 'text-indigo-700');
+                el.classList.add('text-slate-500');
+            });
+            const activeEl = document.getElementById(`nav-${active}`);
+            activeEl.classList.add('bg-indigo-50', 'text-indigo-700');
+            activeEl.classList.remove('text-slate-500');
         }
 
         function renderLessonStep() {
@@ -267,64 +398,69 @@
             const progress = ((lessonIndex) / currentLessonData.length) * 100;
             document.getElementById('lessonBar').style.width = `${progress}%`;
 
-            // Reset footer
+            document.getElementById('footerAction').classList.remove('translate-y-full');
             document.getElementById('btnCheck').classList.remove('hidden');
             document.getElementById('btnCheck').disabled = true;
             document.getElementById('btnContinue').classList.add('hidden');
-            document.getElementById('feedbackText').classList.add('hidden');
-            document.getElementById('footerAction').className = "fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-100 p-6 z-40 transition-colors duration-300";
+            document.getElementById('feedbackText').classList.add('opacity-0');
+            document.getElementById('footerAction').classList.remove('bg-green-50', 'bg-red-50', 'border-green-100', 'border-red-100');
 
             selectedOption = null;
 
-            if (step.type === 'mcq') {
+            if (step.type === 'mcq' || step.type === 'listen') {
                 content.innerHTML = `
-                    <h2 class="text-2xl font-black mb-8">${step.prompt}</h2>
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 text-2xl cursor-pointer hover:bg-blue-200 transition-colors" onclick="speakText('${step.audio}')">
-                            <i class="fas fa-volume-up"></i>
+                    <div class="space-y-8 animate-slide-up">
+                        <div class="space-y-2">
+                             <p class="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Exercise ${lessonIndex + 1}</p>
+                             <h2 class="text-3xl font-black text-slate-900">${step.prompt}</h2>
                         </div>
-                        <p class="text-xl font-bold border-2 border-gray-100 p-4 rounded-2xl bg-gray-50">${step.sentence.replace('_______', '<span class="text-blue-500 underline">_______</span>')}</p>
+                        ${step.type === 'mcq' ? `
+                        <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-6">
+                            <button onclick="speakText('${step.audio}')" class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center hover:bg-indigo-100 transition-all text-xl">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <p class="text-xl font-bold text-slate-700 leading-relaxed">${step.sentence.replace('_______', '<span class="text-indigo-600 border-b-4 border-indigo-100 px-4">_______</span>')}</p>
+                        </div>` : `
+                        <div class="flex justify-center py-10">
+                            <button onclick="speakText('${step.audio}')" class="w-40 h-40 bg-indigo-600 text-white rounded-[3rem] flex items-center justify-center text-5xl shadow-2xl shadow-indigo-200 hover:scale-105 active:scale-95 transition-all">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                        </div>`}
                     </div>
-                    <div class="grid gap-4">
+                    <div class="grid gap-4 animate-slide-up" style="animation-delay: 0.1s">
                         ${step.options.map(opt => `
-                            <button onclick="selectOption(this, '${opt}')" class="option-btn">${opt}</button>
+                            <button onclick="selectOption(this, '${opt}')" class="option-card p-6 rounded-2xl font-bold text-slate-700 text-left transition-all hover:translate-x-1">
+                                ${opt}
+                            </button>
                         `).join('')}
                     </div>
                 `;
             } else if (step.type === 'speak') {
                 content.innerHTML = `
-                    <h2 class="text-2xl font-black mb-8">${step.prompt}</h2>
-                    <div class="flex flex-col items-center gap-6 py-10">
-                        <div class="w-32 h-32 bg-blue-500 text-white rounded-full flex items-center justify-center text-4xl shadow-xl cursor-pointer hover:scale-110 transition-all" onclick="speakText('${step.audio}')">
-                            <i class="fas fa-volume-up"></i>
+                    <div class="space-y-8 animate-slide-up">
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Phonetic Challenge</p>
+                            <h2 class="text-3xl font-black text-slate-900">${step.prompt}</h2>
                         </div>
-                        <h1 class="text-4xl font-black text-gray-800 tracking-tight">${step.target}</h1>
-                        <button onclick="startMicCheck('${step.target}')" id="micBtn" class="mt-8 duo-button-secondary px-8 py-4 rounded-2xl font-black uppercase flex items-center gap-3">
-                            <i class="fas fa-microphone"></i> Tap to speak
-                        </button>
+                        <div class="flex flex-col items-center gap-10 py-12">
+                            <button onclick="speakText('${step.audio}')" class="w-24 h-24 bg-slate-50 text-slate-300 rounded-[2rem] flex items-center justify-center text-3xl border-2 border-slate-100 hover:text-indigo-600 hover:border-indigo-100 transition-all">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <h1 class="text-6xl font-black text-slate-900 tracking-tighter">${step.target}</h1>
+                            <button onclick="startMicCheck('${step.target}')" id="micBtn" class="bg-indigo-600 text-white px-12 py-6 rounded-3xl font-black uppercase tracking-widest flex items-center gap-4 shadow-2xl shadow-indigo-100 hover:bg-indigo-700 transition-all btn-action">
+                                <i class="fas fa-microphone"></i> Tap to speak
+                            </button>
+                        </div>
                     </div>
                 `;
-                // Speaker steps don't need "Check", they trigger on result
                 document.getElementById('btnCheck').classList.add('hidden');
-            } else if (step.type === 'listen') {
-                content.innerHTML = `
-                    <h2 class="text-2xl font-black mb-8">${step.prompt}</h2>
-                    <div class="flex justify-center mb-10">
-                         <button onclick="speakText('${step.audio}')" class="w-40 h-40 bg-blue-500 rounded-3xl border-b-8 border-blue-700 text-white flex items-center justify-center text-6xl shadow-xl active:translate-y-2 active:border-b-0 transition-all">
-                            <i class="fas fa-volume-up"></i>
-                         </button>
-                    </div>
-                    <div class="grid gap-3">
-                        ${step.options.map(opt => `<button onclick="selectOption(this, '${opt}')" class="option-btn">${opt}</button>`).join('')}
-                    </div>
-                `;
             }
         }
 
         // --- Interaction Logic ---
 
         function selectOption(btn, val) {
-            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.option-card').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             selectedOption = val;
             document.getElementById('btnCheck').disabled = false;
@@ -342,25 +478,25 @@
             const btnCheck = document.getElementById('btnCheck');
             const btnContinue = document.getElementById('btnContinue');
 
-            feedback.classList.remove('hidden');
+            feedback.classList.remove('opacity-0');
             btnCheck.classList.add('hidden');
             btnContinue.classList.remove('hidden');
 
             if (isCorrect) {
-                footer.classList.replace('bg-white', 'bg-green-100');
-                document.getElementById('feedbackIcon').className = "w-12 h-12 rounded-full flex items-center justify-center text-2xl bg-white text-green-500";
+                footer.classList.add('bg-green-50', 'border-green-100');
+                document.getElementById('feedbackIcon').className = "w-16 h-16 rounded-3xl flex items-center justify-center text-3xl bg-green-500 text-white shadow-xl shadow-green-100";
                 document.getElementById('feedbackIcon').innerHTML = '<i class="fas fa-check"></i>';
-                document.getElementById('feedbackTitle').innerText = "You are correct!";
-                document.getElementById('feedbackTitle').className = "font-black text-xl text-green-700";
-                xp += 10;
-                document.getElementById('statXP').innerText = xp;
+                document.getElementById('feedbackTitle').innerText = "Outstanding Progress!";
+                document.getElementById('feedbackTitle').className = "font-black text-2xl text-green-900";
+                xp += 25;
+                document.getElementById('statXP').innerText = xp.toLocaleString();
             } else {
-                footer.classList.replace('bg-white', 'bg-red-100');
-                document.getElementById('feedbackIcon').className = "w-12 h-12 rounded-full flex items-center justify-center text-2xl bg-white text-red-500";
+                footer.classList.add('bg-red-50', 'border-red-100');
+                document.getElementById('feedbackIcon').className = "w-16 h-16 rounded-3xl flex items-center justify-center text-3xl bg-red-500 text-white shadow-xl shadow-red-100";
                 document.getElementById('feedbackIcon').innerHTML = '<i class="fas fa-times"></i>';
-                document.getElementById('feedbackTitle').innerText = "Wrong answer!";
-                document.getElementById('feedbackTitle').className = "font-black text-xl text-red-700";
-                document.getElementById('feedbackSub').innerText = `The correct answer was: ${currentLessonData[lessonIndex].correct}`;
+                document.getElementById('feedbackTitle').innerText = "Minor Error Detected";
+                document.getElementById('feedbackTitle').className = "font-black text-2xl text-red-900";
+                document.getElementById('feedbackSub').innerText = `Native usage: ${currentLessonData[lessonIndex].correct}`;
                 hearts--;
                 document.getElementById('statHearts').innerText = hearts;
                 document.body.classList.add('shake');
@@ -378,32 +514,58 @@
         }
 
         function completeLesson() {
-            alert(`Lesson Complete! +50 XP earned.`);
-            document.getElementById('lessonBar').style.width = `100%`;
+            alert(`Unit Milestone Achieved! Mastery Points added.`);
             resetToHome();
         }
 
-        // --- Audio & Voices ---
+        // --- Voice & Synthesis Logic ---
 
         function populateVoices() {
             voices = window.speechSynthesis.getVoices();
-        }
+            const voiceSelect = document.getElementById('voiceTypeSelect');
+            if(!voiceSelect) return;
 
-        function speakText(text) {
-            const utter = new SpeechSynthesisUtterance(text);
-            const voice = voices.find(v => v.lang.startsWith(activeAccent.split('-')[0]));
-            if (voice) utter.voice = voice;
-            utter.rate = 0.9;
-            window.speechSynthesis.speak(utter);
+            voiceSelect.innerHTML = '<option value="auto">Auto-detect Best Voice</option>';
+            
+            // Filter voices that match current accent
+            const region = activeAccent.split('-')[1] || activeAccent;
+            const filtered = voices.filter(v => v.lang.includes(region));
+
+            filtered.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.name;
+                opt.textContent = v.name.replace('Google ', '').replace('Microsoft ', '');
+                voiceSelect.appendChild(opt);
+            });
         }
 
         function setAccent(lang) {
             activeAccent = lang;
-            ['acc-us', 'acc-uk', 'acc-ca'].forEach(id => {
-                document.getElementById(id).className = "p-4 rounded-2xl border-2 border-gray-100 font-bold flex flex-col items-center gap-2";
+            ['acc-us', 'acc-uk', 'acc-au', 'acc-ca', 'acc-in'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.remove('accent-btn-active');
             });
-            const activeId = lang === 'en-US' ? 'acc-us' : lang === 'en-GB' ? 'acc-uk' : 'acc-ca';
-            document.getElementById(activeId).className = "p-4 rounded-2xl border-2 border-blue-500 bg-blue-50 text-blue-700 font-bold flex flex-col items-center gap-2";
+            const activeId = `acc-${lang.split('-')[1].toLowerCase()}`;
+            const activeEl = document.getElementById(activeId);
+            if(activeEl) activeEl.classList.add('accent-btn-active');
+            
+            populateVoices();
+        }
+
+        function speakText(text) {
+            const utter = new SpeechSynthesisUtterance(text);
+            const voiceType = document.getElementById('voiceTypeSelect')?.value || 'auto';
+
+            if(voiceType !== 'auto') {
+                utter.voice = voices.find(v => v.name === voiceType);
+            } else {
+                const voice = voices.find(v => v.lang.startsWith(activeAccent.split('-')[0]) && v.lang.includes(activeAccent.split('-')[1]));
+                if (voice) utter.voice = voice;
+            }
+
+            utter.rate = 0.85;
+            utter.pitch = 1.0;
+            window.speechSynthesis.speak(utter);
         }
 
         function generateAudio() {
@@ -412,25 +574,40 @@
         }
 
         function startMicCheck(target) {
-            if (!('webkitSpeechRecognition' in window)) return alert("Speech recognition not supported.");
+            if (!('webkitSpeechRecognition' in window)) return alert("Voice recognition requires Chrome or Edge.");
             const recognition = new webkitSpeechRecognition();
             recognition.lang = activeAccent;
             
             const btn = document.getElementById('micBtn');
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Listening...';
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing Neural Data...';
+            btn.classList.add('bg-indigo-400');
             
             recognition.onresult = (e) => {
                 const result = e.results[0][0].transcript.toLowerCase();
+                btn.innerHTML = '<i class="fas fa-microphone"></i> Tap to speak';
+                btn.classList.remove('bg-indigo-400');
+
                 if(result.includes(target.toLowerCase())) {
                     handleFeedback(true);
-                    document.getElementById('feedbackTitle').innerText = "Perfect Pronunciation!";
+                    document.getElementById('feedbackTitle').innerText = "Perfect Phonetics!";
                 } else {
                     handleFeedback(false);
-                    document.getElementById('feedbackSub').innerText = `We heard "${result}". Try again!`;
+                    document.getElementById('feedbackSub').innerText = `Detected Phonemes: "${result}"`;
                 }
-                btn.innerHTML = '<i class="fas fa-microphone"></i> Tap to speak';
             };
+
+            recognition.onerror = () => {
+                btn.innerHTML = '<i class="fas fa-microphone"></i> Tap to speak';
+                btn.classList.remove('bg-indigo-400');
+            };
+
             recognition.start();
+        }
+
+        function confirmExit() {
+            if(confirm("Are you sure you want to end this session? Progress will not be saved.")) {
+                resetToHome();
+            }
         }
 
         window.onload = () => {
